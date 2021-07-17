@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content=
+"width=device-width, initial-scale=1">
+<title>Conference Participants</title>
+</head>
+<body>
+<div id="app"></div>
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+integrity=
+"sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+crossorigin="anonymous"></script> 
+<script type="text/javascript" charset="utf-8">
+    var app = document.getElementById("app");
+    var socket = io();
+    socket.on('conference event', data => {
+        if (data.StatusCallbackEvent === "participant-join") {
+            var outerConferenceDiv = document.getElementById(data.ConferenceSid);
+            if (outerConferenceDiv == null) {
+               var newOuterConferenceDiv = document.createElement("div");
+               newOuterConferenceDiv.setAttribute("id", data.ConferenceSid);
+               var innerConferenceDiv = document.createElement("div");
+               var innerConferenceText = document.createTextNode(data.FriendlyName);
+               innerConferenceDiv.appendChild(innerConferenceText);
+               var participantList = document.createElement("ul");
+               participantList.setAttribute("id", data.ConferenceSid);
+               newOuterConferenceDiv.appendChild(innerConferenceDiv);
+               newOuterConferenceDiv.appendChild(participantList);
+               app.appendChild(newOuterConferenceDiv);
+            }
+            
+            var userDiv = document.getElementById(data.CallSid);
+            if (userDiv == null) {
+               var newUserDiv = document.createElement("div");
+               newUserDiv.setAttribute("id", data.CallSid);
+               var newUserText = document.createTextNode(data.CallSid);
+               newUserDiv.appendChild(newUserText);
+               var newUserLi = document.createElement("li");
+               newUserLi.appendChild(newUserDiv);
+               var participantList = document.querySelector("ul[id='" + data.ConferenceSid + "']");
+               participantList.appendChild(newUserLi);
+            }
+        }
+        if (data.StatusCallbackEvent === "participant-leave") {
+            var userDiv = document.getElementById(data.CallSid);
+            if (userDiv !== null) {
+                userDiv.parentElement.remove();
+            }
+        }
+        if (data.StatusCallbackEvent === "conference-end") {
+            var outerConferenceDiv = document.getElementById(data.ConferenceSid);
+            if (outerConferenceDiv !== null) {
+                outerConferenceDiv.remove();
+            }
+        }
+        console.log(data);
+    });
+</script>
+</body>
+</html>
