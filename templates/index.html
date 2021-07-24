@@ -18,40 +18,57 @@ crossorigin="anonymous"></script>
     var socket = io();
     socket.on('conference event', data => {
         if (data.StatusCallbackEvent === "participant-join") {
-            var outerConferenceDiv = document.getElementById(data.ConferenceSid);
+            var outerConferenceDiv = document.getElementById(data.FriendlyName);
             if (outerConferenceDiv == null) {
                var newOuterConferenceDiv = document.createElement("div");
-               newOuterConferenceDiv.setAttribute("id", data.ConferenceSid);
+               newOuterConferenceDiv.setAttribute("id", data.FriendlyName);
                var innerConferenceDiv = document.createElement("div");
                var innerConferenceText = document.createTextNode(data.FriendlyName);
                innerConferenceDiv.appendChild(innerConferenceText);
                var participantList = document.createElement("ul");
-               participantList.setAttribute("id", data.ConferenceSid);
+               participantList.setAttribute("id", data.FriendlyName);
                newOuterConferenceDiv.appendChild(innerConferenceDiv);
                newOuterConferenceDiv.appendChild(participantList);
                app.appendChild(newOuterConferenceDiv);
             }
             
-            var userDiv = document.getElementById(data.CallSid);
+            var userDiv = document.getElementById(data.Caller);
             if (userDiv == null) {
                var newUserDiv = document.createElement("div");
-               newUserDiv.setAttribute("id", data.CallSid);
-               var newUserText = document.createTextNode(data.CallSid);
+               newUserDiv.setAttribute("id", data.Caller);
+               var newUserText = document.createTextNode(data.Caller);
                newUserDiv.appendChild(newUserText);
                var newUserLi = document.createElement("li");
                newUserLi.appendChild(newUserDiv);
-               var participantList = document.querySelector("ul[id='" + data.ConferenceSid + "']");
+               var participantList = document.querySelector("ul[id='" + data.FriendlyName + "']");
                participantList.appendChild(newUserLi);
             }
         }
         if (data.StatusCallbackEvent === "participant-leave") {
-            var userDiv = document.getElementById(data.CallSid);
+            var userDiv = document.getElementById(data.Caller);
             if (userDiv !== null) {
                 userDiv.parentElement.remove();
             }
         }
+        if (data.StatusCallbackEvent === "participant-speech-start") {
+            var userDiv = document.getElementById(data.Caller);
+            var speakingDiv = document.getElementById("speaking-" + data.Caller);
+            if (userDiv !== null && speakingDiv == null) {
+                var newSpeakingDiv = document.createElement("div");
+                newSpeakingDiv.setAttribute("id", "speaking-" + data.Caller);
+                var speakingText = document.createTextNode("- speaking..");
+                newSpeakingDiv.appendChild(speakingText);
+                userDiv.appendChild(newSpeakingDiv);
+            }
+        }
+        if (data.StatusCallbackEvent === "participant-speech-stop") {
+            var speakingDiv = document.getElementById("speaking-" + data.Caller);
+            if (speakingDiv !== null) {
+                speakingDiv.remove();
+            }
+        }
         if (data.StatusCallbackEvent === "conference-end") {
-            var outerConferenceDiv = document.getElementById(data.ConferenceSid);
+            var outerConferenceDiv = document.getElementById(data.FriendlyName);
             if (outerConferenceDiv !== null) {
                 outerConferenceDiv.remove();
             }

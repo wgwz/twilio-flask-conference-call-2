@@ -2,3 +2,4 @@ Flask==2.0.1
 Flask-SocketIO==5.1.0
 pyngrok==5.0.5
 twilio==6.59.0
+simple-websocket==0.2.0
