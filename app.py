@@ -37,6 +37,9 @@ def conference():
     return Response(str(response), mimetype="text/xml")
 
 
+conference_events = []
+
+
 @app.route("/events", methods=["POST"])
 def events():
     print(f"/events: {request.form=}")
@@ -47,12 +50,22 @@ def events():
     if call_sid and caller:
         data["Caller"] = caller
     socketio.emit("conference event", data)
+    if data["StatusCallbackEvent"] == "conference-end":
+        conference_events.clear()
+    else:
+        conference_events.append(data)
     return "", 200
 
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@socketio.on("connect")
+def on_connect():
+    for event in conference_events:
+        emit("conference event catchup", event)
 
 
 if __name__ == "__main__":

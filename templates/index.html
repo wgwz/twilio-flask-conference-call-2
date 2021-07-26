@@ -16,7 +16,7 @@ crossorigin="anonymous"></script>
 <script type="text/javascript" charset="utf-8">
     var app = document.getElementById("app");
     var socket = io();
-    socket.on('conference event', data => {
+    function conferenceEventProcessor(data) {
         if (data.StatusCallbackEvent === "participant-join") {
             var outerConferenceDiv = document.getElementById(data.FriendlyName);
             if (outerConferenceDiv == null) {
@@ -31,7 +31,6 @@ crossorigin="anonymous"></script>
                newOuterConferenceDiv.appendChild(participantList);
                app.appendChild(newOuterConferenceDiv);
             }
-            
             var userDiv = document.getElementById(data.Caller);
             if (userDiv == null) {
                var newUserDiv = document.createElement("div");
@@ -74,6 +73,12 @@ crossorigin="anonymous"></script>
             }
         }
         console.log(data);
+    }
+    socket.on('conference event', data => {
+        conferenceEventProcessor(data);
+    });
+    socket.on('conference event catchup', data => {
+        conferenceEventProcessor(data);
     });
 </script>
 </body>
