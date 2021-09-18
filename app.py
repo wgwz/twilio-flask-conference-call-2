@@ -1,11 +1,8 @@
-import logging
 from flask import Flask, render_template, Response, request
 from flask_socketio import SocketIO, emit
 from twilio.twiml.voice_response import Dial, Gather, VoiceResponse
 
 
-logging.basicConfig(level="DEBUG")
-logger = logging.getLogger()
 app = Flask(__name__)
 app.config.update({"SECRET_KEY": "mysecret"})
 socketio = SocketIO(app)
